@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Controller, Get, Query, UseGuards } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
+import { BadRequestException, Controller, Get, Query } from '@nestjs/common'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import { z } from 'zod'
 import { FetchRecentQuestionsUseCase } from '@/domain/forum/application/use-cases/fetch-recent-questions'
@@ -18,7 +17,6 @@ type PageQueryParamSchema = z.infer<typeof pageQueryParamSchema>
 const queryValidationPipe = new ZodValidationPipe(pageQueryParamSchema)
 
 @Controller('/questions')
-@UseGuards(AuthGuard('jwt'))
 export class FetchRecentQuestionsController {
   constructor(private fetchRecentQuestion: FetchRecentQuestionsUseCase) {}
 
@@ -29,7 +27,7 @@ export class FetchRecentQuestionsController {
     })
 
     if (result.isLeft()) {
-      throw new Error()
+      throw new BadRequestException()
     }
 
     const questions = result.value.questions
